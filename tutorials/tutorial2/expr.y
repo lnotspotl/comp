@@ -52,6 +52,7 @@ int getReg() {
 }
 %type <immediate> IMMEDIATE
 %type <reg_val> REG
+%type <reg_val> expr // assume all expressions are stored in intermediate registers, this is the register
 
 %token ASSIGN SEMI PLUS MINUS LPAREN RPAREN LBRACKET RBRACKET
 
@@ -62,13 +63,43 @@ int getReg() {
 program:   REG ASSIGN expr SEMI { printf("REG (%d) ASSIGN expr SEMI\n", $1); } 
 ;
 
-expr: IMMEDIATE { printf("IMMEDIATE (%d)\n", $1); }
-| REG { printf("REG (%d)\n", $1); }
-| expr PLUS expr { printf("expr PLUS expr\n"); }
-| expr MINUS expr { printf("expr MINUS expr\n"); }
-| LPAREN expr RPAREN { printf("LPAREN expr RPAREN\n"); }
-| MINUS expr { printf("MINUS expr\n"); }
-| LBRACKET expr RBRACKET { printf("LBRACKET expr RBRACKET\n"); }
+expr:  IMMEDIATE   {
+   int r = getReg();
+   printf("# Output of expr: IMMEDIATE\n");
+   printf("AND R%d, R%d, 0\n",r,r);      // clear a register
+   printf("ADD R%d, R%d, %d\n",r, r, $1); // add immediate
+   $$ = r; //specify which register holds the result
+} | REG {
+  $$ = $1;
+} | expr PLUS expr {
+   int r = getReg();
+   printf("# Output of expr: PLUS\n");
+   printf("ADD R%d, R%d, R%d\n", r, $1, $3);
+   $$ = r;
+} | expr MINUS expr {
+   int r = getReg();
+   printf("# Output of expr: MINUS\n");
+   printf("SUB R%d, R%d, R%d\n", r, $1, $3);
+   $$ = r;
+}
+| LPAREN expr RPAREN {
+   int r = getReg();
+   printf("# Output of expr: LPAREN expr RPAREN\n");
+   printf("ADD R%d, R%d, 0\n", r, $2);
+   $$ = r;
+}
+| MINUS expr {
+   int r = getReg();
+   printf("# Output of expr: MINUS expr\n");
+   printf("SUB R%d, 0, R%d\n", r, $2);
+   $$ = r;
+}
+| LBRACKET expr RBRACKET {
+   int r = getReg();
+   printf("# Output of expr: LBRACKET expr RBRACKET\n");
+   printf("LDR R%d, R%d, 0\n", r, $2);
+   $$ = r;
+}
 ;
 
 %%

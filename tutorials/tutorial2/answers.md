@@ -49,3 +49,17 @@ A:
         REG ASSIGN expr SEMI // original
         | STORE REG SEMI // new store instruction
 ```
+
+## Answers to questions in section 6
+
+```
+Q: Is the assembly you generated efficient?  Give an example of your output to make your case. How do you think this relates more broadly to code generation and optimization techniques?
+A: By no means is it efficient. For example, R1 = 1 + 3; could be optimized to R1 = 4; Initially, it's important to generate correct assembly code, only then should we start worrying about efficiency.
+
+Q: Instead of printing the assembly while parsing, what advantages could be had by building a data structure to represent the instructions?
+A: We could optimize the assembly code by reusing registers, for example, if we have the expression R1 = R2 + R3, we could reuse R2 and R3 in the next expression, if they are not used in the next expression (unless they are used in a different part of the program).
+
+Q:  [ECE566] Describe at least one thing that would have to change in your code to make this possible.
+A: We would have to build a data structure to represent the instructions, and then we would have to optimize the assembly code by reusing registers.
+
+```
