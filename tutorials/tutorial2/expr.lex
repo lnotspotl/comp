@@ -12,29 +12,41 @@ void quiet(const char *, ...) {
 
 
 %option noyywrap
+%option debug
 
 %% // begin tokens
 
 [ \n\t]    // ignore a space, a tab, a newline
 
-[Rr][0-7]  
+[Rr][0-7]  {printf("REG: %d ", atoi(yytext+1));}
 
-[0-9]+    
+[0-9]+    {printf("IMM: %d ", atoi(yytext));}
           
-"="         
+"="          {printf("ASSIGN ");}
 
-;         
-"("       
-")"       
-"["       
-"]"       
-"-"       
-"+"       
+;          {printf("SEMI ");}
+
+"("        {printf("LPAREN ");}
+
+")"        {printf("RPAREN ");}
+
+"["        {printf("LBRACKET ");}
+
+"]"        {printf("RBRACKET ");}
+
+"-"        {printf("MINUS ");}
+
+"+"        { printf("PLUS "); }  
+
+"*"        { printf("MULTIPLY "); }
+
+"%"        { printf("MOD "); }
+
+"/"        { printf("DIVIDE "); }
 
 
-"//".*\n  
+"//".*\n  {printf("COMMENT");}
 
-.         
 
 %% // end tokens
 
