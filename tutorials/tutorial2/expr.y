@@ -46,17 +46,24 @@ int getReg() {
 %token IMMEDIATE
 %type  expr
 
+%union {
+  int immediate;
+  int reg_val;
+}
+%type <immediate> IMMEDIATE
+%type <reg_val> REG
+
 %token ASSIGN SEMI PLUS MINUS LPAREN RPAREN LBRACKET RBRACKET
 
 %left  PLUS MINUS
 
 %%
 
-program:   REG ASSIGN expr SEMI { printf("REG ASSIGN expr SEMI\n"); } 
+program:   REG ASSIGN expr SEMI { printf("REG (%d) ASSIGN expr SEMI\n", $1); } 
 ;
 
-expr: IMMEDIATE { printf("IMMEDIATE\n"); }
-| REG { printf("REG\n"); }
+expr: IMMEDIATE { printf("IMMEDIATE (%d)\n", $1); }
+| REG { printf("REG (%d)\n", $1); }
 | expr PLUS expr { printf("expr PLUS expr\n"); }
 | expr MINUS expr { printf("expr MINUS expr\n"); }
 | LPAREN expr RPAREN { printf("LPAREN expr RPAREN\n"); }

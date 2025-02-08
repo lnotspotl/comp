@@ -18,9 +18,9 @@ void quiet(const char *, ...) {
 
 [ \n\t]    // ignore a space, a tab, a newline
 
-[Rr][0-7]  {printf("REG: %d ", atoi(yytext+1)); return REG;}
+[Rr][0-7]  {printf("REG: %d ", atoi(yytext+1)); yylval.reg_val = atoi(yytext+1); return REG;}
 
-[0-9]+    {printf("IMMEDIATE: %d ", atoi(yytext)); return IMMEDIATE;}
+[0-9]+    {printf("IMMEDIATE: %d ", atoi(yytext)); yylval.immediate = atoi(yytext); return IMMEDIATE;}
           
 "="          {printf("ASSIGN "); return ASSIGN;}
 
