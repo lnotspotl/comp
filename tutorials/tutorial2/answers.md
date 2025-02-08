@@ -35,7 +35,7 @@ Actual output:
     MINUS expr
     REG ASSIGN expr SEMI
 
-I was correct.
+I was correct. I learned that I was correct.
 
 Q: Do you see a pattern in the order of the printfs shown above? What is it?
 A: Yes, we are parsing the input from individual tokens to the whole program, i.e. atomic pieces are combined to form the whole program.
