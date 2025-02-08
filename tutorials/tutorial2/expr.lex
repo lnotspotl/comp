@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
+#include "expr.y.hpp"
 
-#define print quiet
+#define printf quiet
 
 void quiet(const char *, ...) {
 }
@@ -12,38 +13,30 @@ void quiet(const char *, ...) {
 
 
 %option noyywrap
-%option debug
 
 %% // begin tokens
 
 [ \n\t]    // ignore a space, a tab, a newline
 
-[Rr][0-7]  {printf("REG: %d ", atoi(yytext+1));}
+[Rr][0-7]  {printf("REG: %d ", atoi(yytext+1)); return REG;}
 
-[0-9]+    {printf("IMM: %d ", atoi(yytext));}
+[0-9]+    {printf("IMMEDIATE: %d ", atoi(yytext)); return IMMEDIATE;}
           
-"="          {printf("ASSIGN ");}
+"="          {printf("ASSIGN "); return ASSIGN;}
 
-;          {printf("SEMI ");}
+;          {printf("SEMI "); return SEMI;}
 
-"("        {printf("LPAREN ");}
+"("        {printf("LPAREN "); return LPAREN;}
 
-")"        {printf("RPAREN ");}
+")"        {printf("RPAREN "); return RPAREN;}
 
-"["        {printf("LBRACKET ");}
+"["        {printf("LBRACKET "); return LBRACKET;}
 
-"]"        {printf("RBRACKET ");}
+"]"        {printf("RBRACKET "); return RBRACKET;}
 
-"-"        {printf("MINUS ");}
+"-"        {printf("MINUS "); return MINUS;}
 
-"+"        { printf("PLUS "); }  
-
-"*"        { printf("MULTIPLY "); }
-
-"%"        { printf("MOD "); }
-
-"/"        { printf("DIVIDE "); }
-
+"+"        { printf("PLUS "); return PLUS;}  
 
 "//".*\n  {printf("COMMENT");}
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
+#include <stdio.h>
 
 using namespace std;
 
@@ -51,16 +52,16 @@ int getReg() {
 
 %%
 
-program:   REG ASSIGN expr SEMI
+program:   REG ASSIGN expr SEMI { printf("REG ASSIGN expr SEMI\n"); } 
 ;
 
-expr: IMMEDIATE
-| REG
-| expr PLUS expr
-| expr MINUS expr
-| LPAREN expr RPAREN
-| MINUS expr
-| LBRACKET expr RBRACKET
+expr: IMMEDIATE { printf("IMMEDIATE\n"); }
+| REG { printf("REG\n"); }
+| expr PLUS expr { printf("expr PLUS expr\n"); }
+| expr MINUS expr { printf("expr MINUS expr\n"); }
+| LPAREN expr RPAREN { printf("LPAREN expr RPAREN\n"); }
+| MINUS expr { printf("MINUS expr\n"); }
+| LBRACKET expr RBRACKET { printf("LBRACKET expr RBRACKET\n"); }
 ;
 
 %%

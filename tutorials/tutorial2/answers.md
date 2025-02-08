@@ -17,3 +17,35 @@ A: Yes, I could:
     "/"        { printf("DIVIDE "); }
 
 ```
+
+## Answers to questions in section 4
+
+```
+Q: Create your own input expression different from the ones above and write down what you think the output will be. Then compare to the actual output. Were you right or wrong? Describe what you observed or learned from this.
+A:
+    R1 = -1;
+
+Expected output:
+    IMMEDIATE
+    MINUS expr
+    REG ASSIGN expr SEMI
+
+Actual output:
+    IMMEDIATE
+    MINUS expr
+    REG ASSIGN expr SEMI
+
+I was correct.
+
+Q: Do you see a pattern in the order of the printfs shown above? What is it?
+A: Yes, we are parsing the input from individual tokens to the whole program, i.e. atomic pieces are combined to form the whole program.
+
+Q: [ECE566] Show how you would extend the grammar to support a store instruction. 
+A:
+    %token STORE // has to be identified as a token first
+
+    %%
+    program:
+        REG ASSIGN expr SEMI // original
+        | STORE REG SEMI // new store instruction
+```
