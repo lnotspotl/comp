@@ -14,7 +14,14 @@
 
 [Rr][0-9]+ {
               yylval.reg = atoi(yytext+1);
-	      return REG;
+	           return REG;
+           }
+[Aa][0-3]+ {
+              yylval.arg = atoi(yytext+1);
+              return ARGUMENT;
+           }
+"return"   { 
+              return RETURN;
            }
 [0-9]+     { 
               yylval.imm = atoi(yytext);
