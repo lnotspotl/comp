@@ -56,7 +56,6 @@ using namespace llvm;
 
 "//".*\n
 
-.         { // ignore }
 
 %% // end tokens
 
