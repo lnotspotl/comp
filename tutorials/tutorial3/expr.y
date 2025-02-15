@@ -7,6 +7,26 @@
 #include <memory>
 #include <stdexcept>
 
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Value.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/IRBuilder.h>
+
+#include <llvm/Bitcode/BitcodeReader.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
+#include <llvm/Support/SystemUtils.h>
+#include <llvm/Support/ToolOutputFile.h>
+#include <llvm/Support/FileSystem.h>
+
+using namespace llvm;
+
+static LLVMContext TheContext;
+static IRBuilder<> Builder(TheContext);
+
+Value *regs[8] = {NULL};
+
+
 #define MYDEBUG
 template<typename ... Args>
 void debug_print(Args ... args) {
@@ -48,14 +68,13 @@ int getReg() {
 %union {
   int reg;
   int imm;
-  int arg;
+  Value *val;
 }
 // Put this after %union and %token directives
 
-%type <reg> expr
-%token <reg> REG
+%type <val> expr
+%token <reg> REG ARGUMENT
 %token <imm> IMMEDIATE
-%token <arg> ARGUMENT
 %token ASSIGN SEMI PLUS MINUS LPAREN RPAREN LBRACKET RBRACKET RETURN
 
 %type expr
@@ -66,49 +85,50 @@ int getReg() {
 
 program:   REG ASSIGN expr SEMI
 {
-  debug_print("R%d = %d\n", $1, $3);
+  regs[$1] = $3;
 }
 | program REG ASSIGN expr SEMI
 {
-  debug_print("R%d = %d\n", $2, $4);
+  regs[$2] = $4;
 }
 | program RETURN REG SEMI
 {
   debug_print("RETURN %d\n", $3);
+  Builder.CreateRet(regs[$3]);
+  return 0; // exit parser
 }
 ;
-
 expr: IMMEDIATE
 {
-  debug_print("expr: %d\n", $1);
+  $$ = Builder.getInt32($1);
 }
 | REG
 { 
-  debug_print("expr: %d\n", $1);
+  $$ = regs[$1];
 }
 | ARGUMENT
 {
-  debug_print("expr: %d\n", $1);
+  $$ = regs[$1];
 }
 | expr PLUS expr
 {
-  debug_print("expr: %d\n", $1);
+  $$ = Builder.CreateAdd($1, $3);
 }
 | expr MINUS expr
 {
-  debug_print("expr: %d\n", $1);
+  $$ = Builder.CreateSub($1, $3);
 }
 | LPAREN expr RPAREN
 {
-  debug_print("expr: %d\n", $2);
+  $$ = $2;
 }
 | MINUS expr
 {
-  debug_print("expr: %d\n", $2);
+  $$ = Builder.CreateNeg($2);
 }
 | LBRACKET expr RBRACKET
 {
-  debug_print("expr: %d\n", $2);
+  $$ = Builder.CreateLoad(Builder.getInt32Ty(),$2);
 }
 ;
 
@@ -119,15 +139,37 @@ void yyerror(const char* msg)
   printf("%s",msg);
 }
 
-int main(int argc, char *argv[])
-{
-  yydebug = 0;
-  yyin = stdin; // get input from screen
+int main() {
 
+  Module *M = new Module("Tutorial3", TheContext);
+  Type *i32 = Builder.getInt32Ty();
+  std::vector<Type*> args = {i32,i32,i32,i32};
+
+  // Create void function type with no arguments
+  FunctionType *FunType = FunctionType::get(Builder.getInt32Ty(),args,false);
+
+  // Create a main function
+  Function *Function = Function::Create(FunType, GlobalValue::ExternalLinkage, "myfunction",M);
+
+  //Add a basic block to main to hold instructions
+  BasicBlock *BB = BasicBlock::Create(TheContext, "entry", Function);
+  // Ask builder to place new instructions at end of the
+  // basic block
+  Builder.SetInsertPoint(BB);
+
+  yydebug = 0;
+  yyin = stdin;
+  // yyparse() triggers parsing of the input
   if (yyparse()==0) {
-    // parse successful!
-    
+    // all is good
+    std::error_code EC;
+    raw_fd_ostream OS("main.bc",EC,sys::fs::OF_None);
+    WriteBitcodeToFile(*M,OS);
+
+    // Dump LLVM IR to the screen for debugging                                                                                                
+    M->print(errs(),nullptr,false,true);
+  } else {
+    printf("There was a problem! Read error messages above.\n");
   }
-  
   return 0;
 }

@@ -3,6 +3,9 @@
 #include <iostream>
 #include <math.h>
 
+#include <llvm/IR/Value.h>
+using namespace llvm;
+
 #include "expr.y.hpp" 
 %}
 
@@ -17,7 +20,7 @@
 	           return REG;
            }
 [Aa][0-3]+ {
-              yylval.arg = atoi(yytext+1);
+              yylval.reg = atoi(yytext+1);
               return ARGUMENT;
            }
 "return"   { 
