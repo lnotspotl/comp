@@ -25,6 +25,7 @@ static LLVMContext TheContext;
 static IRBuilder<> Builder(TheContext);
 
 Value *regs[8] = {NULL};
+Function *func = nullptr;
 
 
 #define MYDEBUG
@@ -108,7 +109,7 @@ expr: IMMEDIATE
 }
 | ARGUMENT
 {
-  $$ = regs[$1];
+  $$ = func->getArg($1);
 }
 | expr PLUS expr
 {
@@ -145,14 +146,18 @@ int main() {
   Type *i32 = Builder.getInt32Ty();
   std::vector<Type*> args = {i32,i32,i32,i32};
 
+  for(int i=0; i<8; i++) {
+    regs[i] = Builder.getInt32(0);
+  }
+
   // Create void function type with no arguments
   FunctionType *FunType = FunctionType::get(Builder.getInt32Ty(),args,false);
 
   // Create a main function
-  Function *Function = Function::Create(FunType, GlobalValue::ExternalLinkage, "myfunction",M);
+  func = Function::Create(FunType, GlobalValue::ExternalLinkage, "myfunction",M);
 
   //Add a basic block to main to hold instructions
-  BasicBlock *BB = BasicBlock::Create(TheContext, "entry", Function);
+  BasicBlock *BB = BasicBlock::Create(TheContext, "entry", func);
   // Ask builder to place new instructions at end of the
   // basic block
   Builder.SetInsertPoint(BB);
