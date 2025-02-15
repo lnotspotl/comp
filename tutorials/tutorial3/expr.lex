@@ -56,7 +56,7 @@ using namespace llvm;
 
 "//".*\n
 
-.         { printf("syntax error!\n"); exit(1); }
+.         { // ignore }
 
 %% // end tokens
 
