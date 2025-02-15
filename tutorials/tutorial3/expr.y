@@ -146,6 +146,11 @@ int main() {
   Type *i32 = Builder.getInt32Ty();
   std::vector<Type*> args = {i32,i32,i32,i32};
 
+  for(int i=0; i<8; i++) {
+    regs[i] = Builder.getInt32(0);
+  }
+
+
   // Create void function type with no arguments
   FunctionType *FunType = FunctionType::get(Builder.getInt32Ty(),args,false);
 
