@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
+#include <sstream>
 
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Value.h>
@@ -28,7 +29,6 @@ Value *regs[8] = {NULL};
 Function *func = nullptr;
 
 
-#define MYDEBUG
 template<typename ... Args>
 void debug_print(Args ... args) {
   #ifdef MYDEBUG
@@ -164,8 +164,10 @@ int main() {
   Builder.SetInsertPoint(BB);
 
   yydebug = 0;
-  yyin = stdin;
-  // yyparse() triggers parsing of the input
+  std::string input;
+  std::getline(std::cin, input);
+  yyin = fmemopen((void*)input.c_str(), input.length(), "r");
+  std::cout << "Input: " << input << std::endl;
   if (yyparse()==0) {
     // all is good
     std::error_code EC;
